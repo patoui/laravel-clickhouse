@@ -40,8 +40,16 @@ You can install the package via composer:
 
 ### Testing
 
-``` bash
-composer test
+Testing is done within docker to simplify setting up Clickhouse
+
+```bash
+docker-compose up
+```
+
+Run the tests:
+
+```bash
+docker exec -it lc_php /bin/bash -c "composer test"
 ```
 
 ### Changelog
