@@ -128,7 +128,7 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Run an insert statement against the database.
      *
-     * @param string $query
+     * @param string $query Query is table name
      * @param array  $bindings
      * @return bool
      */
@@ -286,24 +286,13 @@ class ClickhouseConnection extends BaseConnection
             return [[], []];
         }
 
-        $first = $bindings[0] ?? null;
-
-        if (!is_array($first)) {
+        if (!is_string(current(array_flip($bindings)))) {
             throw new InvalidArgumentException(
-                "Bindings must be an array of arrays, i.e. [['name' => 'John', 'user_id' => 321]]"
+                "Keys must be strings, i.e. ['name' => 'John', 'user_id' => 321]"
             );
         }
 
-        if (!is_string(current(array_flip($first)))) {
-            throw new InvalidArgumentException(
-                "Keys must be strings, i.e. [['name' => 'John', 'user_id' => 321]]"
-            );
-        }
-
-        $keys   = array_keys($first);
-        $values = array_map('array_keys', $bindings);
-
-        return [$keys, $values];
+        return [array_keys($bindings), [array_values($bindings)]];
     }
 
     /**

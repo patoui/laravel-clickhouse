@@ -12,8 +12,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a raw where clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereRaw(Builder $query, $where)
@@ -24,14 +24,13 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a basic where clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereBasic(Builder $query, $where)
     {
-//        $value = $this->parameter($where['value']);
-        $value = $this->wrapInCurlyBraces($where);
+        $value = $this->parameter($where['value'], $where['column'] ?? null);
 
         return $this->wrap($where['column']) . ' ' . $where['operator'] . ' ' . $value;
     }
@@ -39,8 +38,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "where in" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereIn(Builder $query, $where)
@@ -55,8 +54,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "where not in" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereNotIn(Builder $query, $where)
@@ -73,8 +72,8 @@ class ClickhouseGrammar extends Grammar
      *
      * For safety, whereIntegerInRaw ensures this method is only used with integer values.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereNotInRaw(Builder $query, $where)
@@ -91,8 +90,8 @@ class ClickhouseGrammar extends Grammar
      *
      * For safety, whereIntegerInRaw ensures this method is only used with integer values.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereInRaw(Builder $query, $where)
@@ -107,8 +106,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "where null" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereNull(Builder $query, $where)
@@ -119,8 +118,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "where not null" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereNotNull(Builder $query, $where)
@@ -131,8 +130,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "between" where clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereBetween(Builder $query, $where)
@@ -149,8 +148,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "between" where clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereBetweenColumns(Builder $query, $where)
@@ -167,8 +166,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "where date" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereDate(Builder $query, $where)
@@ -179,8 +178,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "where time" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereTime(Builder $query, $where)
@@ -191,8 +190,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "where day" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereDay(Builder $query, $where)
@@ -203,8 +202,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "where month" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereMonth(Builder $query, $where)
@@ -215,8 +214,8 @@ class ClickhouseGrammar extends Grammar
     /**
      * Compile a "where year" clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
+     * @param Builder $query
+     * @param array   $where
      * @return string
      */
     protected function whereYear(Builder $query, $where)
@@ -225,14 +224,44 @@ class ClickhouseGrammar extends Grammar
     }
 
     /**
-     * Wrap in curly braces for clickhouse to recognize
-     * @param array $where
+     * Compile an insert statement into SQL.
+     *
+     * @param Builder $query
+     * @param  array  $values
      * @return string
      */
-    private function wrapInCurlyBraces(array $where): string
+    public function compileInsert(Builder $query, array $values): string
     {
-        return $this->isExpression($where['value'])
-            ? $where['value']
-            : '{' . $where['column'] . '}';
+        return $this->wrapTable($query->from);
+    }
+
+    /**
+     * Create query parameter place-holders for an array.
+     *
+     * @param  array  $values
+     * @return string
+     */
+    public function parameterize(array $values): string
+    {
+        $parameters = [];
+        $key_counts = [];
+        foreach ($values as $key => $value) {
+            $key_count = $key_counts[$key] ?? 0;
+            $parameters[] = $this->parameter($value, $key > 0 ? "{$key}_{$key_count}" : $key);
+            $key_counts[$key] = empty($key_counts[$key]) ? 1 : $key_counts[$key] + 1;
+        }
+        return implode(', ', $parameters);
+    }
+
+    /**
+     * Get the appropriate query parameter place-holder for a value.
+     *
+     * @param mixed $value
+     * @param null  $key
+     * @return string
+     */
+    public function parameter($value, $key = null): string
+    {
+        return $this->isExpression($value) ? $this->getValue($value) : '{' . $key . '}';
     }
 }
