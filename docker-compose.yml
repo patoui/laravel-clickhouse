@@ -1,0 +1,38 @@
+version: '3'
+services:
+
+  #PHP Service
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    image: library/php
+    container_name: lc_php
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - app-network
+
+  clickhouse:
+    container_name: lc_clickhouse
+    image: yandex/clickhouse-server
+    ports:
+      - "8123:8123"
+    volumes:
+      - ./clickhouse:/var/lib/clickhouse
+    networks:
+      - app-network
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  lc_clickhouse:
