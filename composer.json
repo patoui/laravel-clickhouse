@@ -1,0 +1,53 @@
+{
+    "name": "patoui/laravel-clickhouse",
+    "description": "Laravel SeasClick Clickhouse",
+    "keywords": [
+        "patoui",
+        "laravel-clickhouse"
+    ],
+    "homepage": "https://github.com/patoui/laravel-clickhouse",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Patrique Ouimet",
+            "email": "patrique.ouimet@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.3",
+        "ext-SeasClick": "*",
+        "illuminate/support": "^7.0",
+        "illuminate/container": "^7.0",
+        "illuminate/database": "^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Patoui\\LaravelClickhouse\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Patoui\\LaravelClickhouse\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Patoui\\LaravelClickhouse\\LaravelClickhouseServiceProvider"
+            ]
+        }
+    }
+}
