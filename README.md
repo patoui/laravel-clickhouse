@@ -70,7 +70,7 @@ DB::connection('clickhouse')->table('analytics')->insert([
 DB::connection('clickhouse')
     ->table('analytics')
     ->where('ts', '>', strtotime('-1 day'))
-    ->count()
+    ->count();
     
 class Analytic extends ClickhouseModel
 {
@@ -79,7 +79,7 @@ class Analytic extends ClickhouseModel
 
 Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
 
-Analytic::where('ts', '>', strtotime('-1 day'))->count()
+Analytic::where('ts', '>', strtotime('-1 day'))->count();
 ```
 
 ### Testing
