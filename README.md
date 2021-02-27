@@ -43,13 +43,13 @@ You can install the package via composer:
 Testing is done within docker to simplify setting up Clickhouse
 
 ```bash
-docker-compose up
+docker-compose up --build
 ```
 
 Run the tests:
 
 ```bash
-docker exec -it lc_php /bin/bash -c "composer test"
+composer test
 ```
 
 ### Changelog

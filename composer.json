@@ -37,8 +37,8 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+        "test": "docker exec -it lc_php /bin/bash -c \"vendor/bin/phpunit\"",
+        "test-coverage": "docker exec -it lc_php /bin/bash -c \"vendor/bin/phpunit --coverage-html coverage\""
     },
     "config": {
         "sort-packages": true
