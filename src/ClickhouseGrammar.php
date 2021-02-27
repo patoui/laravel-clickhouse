@@ -30,7 +30,7 @@ class ClickhouseGrammar extends Grammar
      */
     protected function whereBasic(Builder $query, $where)
     {
-        $value = $this->parameter($where['value'], $where['column'] ?? null);
+        $value = $this->parameter($where['value'], $where['token'] ?? null);
 
         return $this->wrap($where['column']) . ' ' . $where['operator'] . ' ' . $value;
     }
@@ -227,7 +227,7 @@ class ClickhouseGrammar extends Grammar
      * Compile an insert statement into SQL.
      *
      * @param Builder $query
-     * @param  array  $values
+     * @param array   $values
      * @return string
      */
     public function compileInsert(Builder $query, array $values): string
@@ -238,7 +238,7 @@ class ClickhouseGrammar extends Grammar
     /**
      * Create query parameter place-holders for an array.
      *
-     * @param  array  $values
+     * @param array $values
      * @return string
      */
     public function parameterize(array $values): string
@@ -246,8 +246,8 @@ class ClickhouseGrammar extends Grammar
         $parameters = [];
         $key_counts = [];
         foreach ($values as $key => $value) {
-            $key_count = $key_counts[$key] ?? 0;
-            $parameters[] = $this->parameter($value, $key > 0 ? "{$key}_{$key_count}" : $key);
+            $key_count        = $key_counts[$key] ?? 0;
+            $parameters[]     = $this->parameter($value, $key > 0 ? "{$key}_{$key_count}" : $key);
             $key_counts[$key] = empty($key_counts[$key]) ? 1 : $key_counts[$key] + 1;
         }
         return implode(', ', $parameters);
@@ -263,5 +263,25 @@ class ClickhouseGrammar extends Grammar
     public function parameter($value, $key = null): string
     {
         return $this->isExpression($value) ? $this->getValue($value) : '{' . $key . '}';
+    }
+
+    /**
+     * Get an array of all the where clauses for the query.
+     *
+     * @param Builder $query
+     * @return array
+     */
+    protected function compileWheresToArray($query)
+    {
+        $keys = [];
+        return collect($query->wheres)->map(function ($where, $key) use ($query, &$keys) {
+            $col = $where['column'];
+            if (!isset($keys[$col])) {
+                $keys[$col] = 0;
+            }
+            $where['token'] = $where['column'] . ($keys[$col] > 0 ? $keys[$col] : '');
+            $keys[$col]++;
+            return $where['boolean'] . ' ' . $this->{"where{$where['type']}"}($query, $where);
+        })->all();
     }
 }

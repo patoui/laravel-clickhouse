@@ -10,25 +10,46 @@ use Illuminate\Database\Query\Expression;
 class ClickhouseBuilder extends Builder
 {
     /**
+     * Retrieve the "count" result of the query.
+     *
+     * @param string $columns
+     * @return int
+     */
+    public function count($columns = null)
+    {
+        return parent::count($columns ?: []);
+    }
+
+    /**
      * @return array
      */
     public function getBindings(): array
     {
         $bindings = [];
-        foreach ($this->wheres as $where) {
+        $keys     = [];
+
+        foreach ($this->wheres as &$where) {
             if (!empty($where['value']) && !$where['value'] instanceof Expression) {
-                // TODO: consider duplicate where column names
+                $col = $where['column'];
+                if (!isset($keys[$col])) {
+                    $keys[$col] = 0;
+                }
+
+                $where['column'] .= ($keys[$col] ?: '');
+
                 $bindings[$where['column']] = $where['value'];
+
+                $keys[$col]++;
             }
         }
-        // TODO: Consider overwrites from duplicate keys
+
         return $bindings;
     }
 
     /**
      * Insert a new record into the database.
      *
-     * @param  array  $values
+     * @param array $values
      * @return bool
      */
     public function insert(array $values): bool
@@ -40,7 +61,7 @@ class ClickhouseBuilder extends Builder
             return true;
         }
 
-        if (! is_array(reset($values))) {
+        if (!is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -67,13 +88,13 @@ class ClickhouseBuilder extends Builder
     /**
      * Remove all of the expressions from a list of bindings.
      *
-     * @param  array  $bindings
+     * @param array $bindings
      * @return array
      */
     protected function cleanBindings(array $bindings): array
     {
         return array_filter($bindings, static function ($binding) {
-            return ! $binding instanceof Expression;
+            return !$binding instanceof Expression;
         });
     }
 }

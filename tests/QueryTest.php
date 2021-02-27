@@ -2,39 +2,15 @@
 
 namespace Patoui\LaravelClickhouse\Tests;
 
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 
 class QueryTest extends TestCase
 {
-    /** @var ConnectionInterface */
-    private $connection;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->connection = DB::connection('clickhouse');
-
-        $this->connection->statement('
-            CREATE TABLE IF NOT EXISTS analytics (
-                dt              Date DEFAULT toDate(ts),
-                ts              DateTime,
-                analytic_id     UInt32,
-                status          String
-            ) ENGINE = MergeTree (dt, (analytic_id, dt), 8192);
-        ');
-    }
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        $this->connection->statement('TRUNCATE TABLE IF EXISTS analytics');
-    }
-
     public function testInsert(): void
     {
+        // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
-        $this->connection->insert(
+        DB::connection('clickhouse')->insert(
             'analytics',
             ['ts' => time(), 'analytic_id' => 321, 'status' => 204]
         );
@@ -42,8 +18,9 @@ class QueryTest extends TestCase
 
     public function testTableInsert(): void
     {
+        // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
-        $this->connection->table('analytics')->insert([
+        DB::connection('clickhouse')->table('analytics')->insert([
             'ts'          => time(),
             'analytic_id' => 321,
             'status'      => 204,
@@ -52,20 +29,97 @@ class QueryTest extends TestCase
 
     public function testWhere(): void
     {
-        $this->connection->insert(
+        // Arrange
+        DB::connection('clickhouse')->insert(
             'analytics',
             ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
         );
-        $this->connection->insert(
+        DB::connection('clickhouse')->insert(
             'analytics',
             ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
         );
+
+        // Act & Assert
         self::assertSame(
             2,
-            $this->connection
+            DB::connection('clickhouse')
                 ->table('analytics')
                 ->where('ts', '>', strtotime('-1 day'))
                 ->count()
         );
+    }
+
+    public function testMultipleWheres(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+
+        // Act & Assert
+        self::assertSame(
+            2,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->where('ts', '>', strtotime('-1 day'))
+                ->where('ts', '<', strtotime('+1 day'))
+                ->count()
+        );
+    }
+
+    public function testSelect(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            $row1 = ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            $row2 = ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(600, 999)]
+        );
+
+        // Act
+        $records = DB::connection('clickhouse')
+                ->table('analytics')
+                ->select('ts', 'status')
+                ->get()
+                ->toArray();
+        // ensure order of records
+        usort($records, static function ($a, $b) {
+            if ($a['status'] === $b['status']) {
+                return 0;
+            }
+            return ($a['status'] < $b['status']) ? -1 : 1;
+        });
+
+        // Assert
+        self::assertEquals($row1['ts'], $records[0]['ts']);
+        self::assertEquals($row1['status'], $records[0]['status']);
+        self::assertEquals($row2['ts'], $records[1]['ts']);
+        self::assertEquals($row2['status'], $records[1]['status']);
+    }
+
+    public function testSelectRaw(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+
+        // Act
+        $record = DB::connection('clickhouse')
+                ->table('analytics')
+                ->selectRaw('toMonth(dt) as month_number')
+                ->first();
+
+        // Assert
+        self::assertEquals($record['month_number'], idate('m'));
     }
 }

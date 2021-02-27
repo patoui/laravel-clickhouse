@@ -29,13 +29,55 @@ You can install the package via composer:
 }
 ```
 
-## Usage
-
+Add service provider
 ``` php
 'providers' => [
     // Other Service Providers
     Patoui\LaravelClickhouse\LaravelClickhouseServiceProvider::class,
 ],
+```
+
+Add connection details
+
+```php
+'connections' => [
+    'clickhouse' => [
+        'host'     => '127.0.0.1',
+        'port'     => '9000',
+        'username' => 'default',
+        'password' => '',
+    ]
+],
+```
+
+## Usage
+
+Use as you normally would an eloquent model or query builder
+```
+DB::connection('clickhouse')->insert(
+    'analytics',
+    ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+);
+        
+DB::connection('clickhouse')->table('analytics')->insert([
+    'ts'          => time(),
+    'analytic_id' => 321,
+    'status'      => 204,
+]);
+
+DB::connection('clickhouse')
+    ->table('analytics')
+    ->where('ts', '>', strtotime('-1 day'))
+    ->count()
+    
+class Analytic extends ClickhouseModel
+{
+    public $guarded = []; // optional, added for brevity
+}
+
+Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+
+Analytic::where('ts', '>', strtotime('-1 day'))->count()
 ```
 
 ### Testing
