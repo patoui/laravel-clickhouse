@@ -30,6 +30,7 @@ You can install the package via composer:
 ```
 
 Add service provider
+
 ``` php
 'providers' => [
     // Other Service Providers
@@ -53,7 +54,8 @@ Add connection details
 ## Usage
 
 Use as you normally would an eloquent model or query builder
-```
+
+```php
 DB::connection('clickhouse')->insert(
     'analytics',
     ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
