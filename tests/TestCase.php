@@ -33,7 +33,8 @@ class TestCase extends BaseTestCase
                 dt              Date DEFAULT toDate(ts),
                 ts              DateTime,
                 analytic_id     UInt32,
-                status          String
+                status          UInt16,
+                name            String DEFAULT \'\'
             ) ENGINE = MergeTree (dt, (analytic_id, dt), 8192);
         ');
     }

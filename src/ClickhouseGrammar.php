@@ -247,7 +247,7 @@ class ClickhouseGrammar extends Grammar
         $key_counts = [];
         foreach ($values as $key => $value) {
             $key_count        = $key_counts[$key] ?? 0;
-            $parameters[]     = $this->parameter($value, $key > 0 ? "{$key}_{$key_count}" : $key);
+            $parameters[]     = $this->parameter($value, $key);
             $key_counts[$key] = empty($key_counts[$key]) ? 1 : $key_counts[$key] + 1;
         }
         return implode(', ', $parameters);
@@ -262,7 +262,13 @@ class ClickhouseGrammar extends Grammar
      */
     public function parameter($value, $key = null): string
     {
-        return $this->isExpression($value) ? $this->getValue($value) : '{' . $key . '}';
+        if ($this->isExpression($value)) {
+            return $this->getValue($value);
+        }
+
+        $param = '{' . $key . '}';
+
+        return is_string($value) ? "'{$param}'" : $param;
     }
 
     /**
@@ -271,17 +277,106 @@ class ClickhouseGrammar extends Grammar
      * @param Builder $query
      * @return array
      */
-    protected function compileWheresToArray($query)
+    protected function compileWheresToArray($query): array
     {
-        $keys = [];
-        return collect($query->wheres)->map(function ($where, $key) use ($query, &$keys) {
-            $col = $where['column'];
-            if (!isset($keys[$col])) {
-                $keys[$col] = 0;
+        $compiled_wheres = [];
+        foreach ($query->wheres as $key => $where) {
+            $query->wheres[$key]['token'] = $where['token'] = $this->prepareKey($query, $where['column']);
+
+            $compiled_wheres[] = $where['boolean'] . ' ' . $this->{"where{$where['type']}"}($query, $where);
+        }
+
+        return $compiled_wheres;
+    }
+
+    /**
+     * Compile the columns for an update statement.
+     *
+     * @param Builder $query
+     * @param array   $values
+     * @return string
+     */
+    protected function compileUpdateColumns(Builder $query, array $values): string
+    {
+        return collect($values)->map(function ($value, $key) use ($query) {
+            return $this->wrap($key) . ' = ' . $this->parameter($value, $this->prepareKey($query, $key));
+        })->implode(', ');
+    }
+
+    /**
+     * Compile an update statement without joins into SQL.
+     *
+     * @param Builder $query
+     * @param string  $table
+     * @param string  $columns
+     * @param string  $where
+     * @return string
+     */
+    protected function compileUpdateWithoutJoins(Builder $query, $table, $columns, $where): string
+    {
+        return "alter table {$table} update {$columns} {$where}";
+    }
+
+    /**
+     * Compile an update statement into SQL.
+     *
+     * @param Builder $query
+     * @param array   $values
+     * @return string
+     */
+    public function compileUpdate(Builder $query, array $values): string
+    {
+        $table = $this->wrapTable($query->from);
+
+        $columns = $this->compileUpdateColumns($query, $values);
+
+        $where = $this->compileWheres($query);
+
+        return trim(
+            isset($query->joins)
+                ? $this->compileUpdateWithJoins($query, $table, $columns, $where)
+                : $this->compileUpdateWithoutJoins($query, $table, $columns, $where)
+        );
+    }
+
+    /**
+     * Prepare the bindings for an update statement.
+     *
+     * @param array $bindings
+     * @param array $values
+     * @return array
+     */
+    public function prepareBindingsForUpdate(array $bindings, array $values): array
+    {
+        foreach ($bindings as $component => $component_bindings) {
+            if (!$component_bindings) {
+                continue;
             }
-            $where['token'] = $where['column'] . ($keys[$col] > 0 ? $keys[$col] : '');
-            $keys[$col]++;
-            return $where['boolean'] . ' ' . $this->{"where{$where['type']}"}($query, $where);
-        })->all();
+            foreach ($component_bindings as $key => $value) {
+                if (!isset($values[$key])) {
+                    $values[$key] = $value;
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Format named parameter key to avoid duplicates
+     * @param Builder $query
+     * @param string  $key
+     * @return string
+     */
+    private function prepareKey(Builder $query, string $key): string
+    {
+        if (!isset($query->binding_count[$key])) {
+            $query->binding_count[$key] = 0;
+        }
+        $key_count = ++$query->binding_count[$key];
+        $key_index = $key_count - 1;
+        $key       .= ($key_index > 0 ? $key_index : '');
+
+        return $key;
     }
 }

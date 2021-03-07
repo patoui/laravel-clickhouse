@@ -86,6 +86,28 @@ class ClickhouseBuilder extends Builder
     }
 
     /**
+     * Update a record in the database.
+     *
+     * @param  array  $values
+     * @return int
+     */
+    public function update(array $values)
+    {
+        $sql = $this->grammar->compileUpdate($this, $values);
+
+        $prepared_wheres = [];
+        for ($i = 0, $max = count($this->wheres); $i < $max; $i++) {
+            $prepared_wheres[$this->wheres[$i]['token']] = $this->bindings['where'][$i];
+        }
+
+        $prepared_bindings = array_merge($this->bindings, ['where' => $prepared_wheres]);
+
+        return $this->connection->update($sql, $this->cleanBindings(
+            $this->grammar->prepareBindingsForUpdate($prepared_bindings, $values)
+        ));
+    }
+
+    /**
      * Remove all of the expressions from a list of bindings.
      *
      * @param array $bindings
