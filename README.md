@@ -77,9 +77,11 @@ class Analytic extends ClickhouseModel
     public $guarded = []; // optional, added for brevity
 }
 
-Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => 204, 'name' => 'page_view']);
 
 Analytic::where('ts', '>', strtotime('-1 day'))->count();
+
+Analytic::where('name', 'page_view')->update(['name' => 'page_visit']);
 ```
 
 ### Testing
