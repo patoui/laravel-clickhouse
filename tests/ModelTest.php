@@ -2,6 +2,8 @@
 
 namespace Patoui\LaravelClickhouse\Tests;
 
+use Illuminate\Support\Facades\DB;
+
 class ModelTest extends TestCase
 {
     public function testCreate(): void
@@ -93,5 +95,39 @@ class ModelTest extends TestCase
                     ->where('status', 200)
                     ->count()
         );
+    }
+
+    public function testJsonExtract(): void
+    {
+        // Arrange
+        Analytic::create([
+            'ts'          => time(),
+            'analytic_id' => 123,
+            'status'      => 200,
+            'name'        => json_encode(['action' => 'page_visit', 'referer' => ['https://google.com/']]),
+        ]);
+        Analytic::create([
+            'ts'          => time(),
+            'analytic_id' => 124,
+            'status'      => 200,
+            'name'        => json_encode(['action' => 'page_view', 'referer' => ['https://duckduckgo.com/']]),
+        ]);
+
+        // Act
+        $results = Analytic::select([
+            'dt',
+            'ts',
+            'analytic_id',
+            'status',
+            DB::raw("JSONExtractString(name, 'action') as action"),
+            DB::raw("arrayElement(JSONExtract(name, 'referer', 'Array(String)'), 1) as main_referer"),
+        ])->where('status', 200)->orderBy('analytic_id')->get();
+
+        // Assert
+        self::assertCount(2, $results);
+        self::assertSame('page_visit', $results[0]->action);
+        self::assertSame('https://google.com/', $results[0]->main_referer);
+        self::assertSame('page_view', $results[1]->action);
+        self::assertSame('https://duckduckgo.com/', $results[1]->main_referer);
     }
 }
