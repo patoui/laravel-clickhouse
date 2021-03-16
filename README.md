@@ -11,6 +11,10 @@ An Eloquent model and Query builder with support for Clickhouse using the [SeasC
 
 **This package/repository is in active development, use at your own risk.**
 
+## Requirements
+
+[SeasClick](https://github.com/seasx/seasclick) extension 
+
 ## Installation
 
 You can install the package via composer:
