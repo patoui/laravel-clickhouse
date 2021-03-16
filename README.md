@@ -61,7 +61,7 @@ Use as you normally would an eloquent model or query builder.
 
 See `tests` directory for additional examples
 
-Currently untested methods or functionality:
+Below is a list of currently untested methods or functionality. This does not mean that they won't work, just that there is currently no test coverage.
 
 - `union`
 - `orWhere`
