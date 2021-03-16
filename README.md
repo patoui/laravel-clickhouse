@@ -53,7 +53,29 @@ Add connection details
 
 ## Usage
 
-Use as you normally would an eloquent model or query builder
+Use as you normally would an eloquent model or query builder.
+
+See `tests` directory for additional examples
+
+Currently untested methods or functionality:
+
+- `union`
+- `orWhere`
+- JSON where clause `->where('meta->name', 'foobar')`
+- `whereJsonContains`
+- `whereJsonLength`
+- `whereBetween`
+- `whereNotBetween`
+- `whereIn` or `whereNotIn`
+- `whereNull` or `whereNotNull`
+- `whereDate`, `whereMonth`, `whereDay`, `whereYear`, `whereTime`
+- `orWhereColumn`
+- `whereExists`
+- Subquery Where Clauses
+- Upserts
+- `updateOrInsert`
+- Updating JSON Columns `->update(['options->enabled' => true]);`
+- `increment` or `decrement`
 
 ```php
 DB::connection('clickhouse')->insert(
