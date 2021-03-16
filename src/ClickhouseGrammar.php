@@ -281,7 +281,9 @@ class ClickhouseGrammar extends Grammar
     {
         $compiled_wheres = [];
         foreach ($query->wheres as $key => $where) {
-            $query->wheres[$key]['token'] = $where['token'] = $this->prepareKey($query, $where['column']);
+            if (isset($where['column'])) {
+                $query->wheres[$key]['token'] = $where['token'] = $this->prepareKey($query, $where['column']);
+            }
 
             $compiled_wheres[] = $where['boolean'] . ' ' . $this->{"where{$where['type']}"}($query, $where);
         }

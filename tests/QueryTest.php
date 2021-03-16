@@ -122,4 +122,38 @@ class QueryTest extends TestCase
         // Assert
         self::assertEquals($record['month_number'], idate('m'));
     }
+
+    public function testJoin(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->statement('TRUNCATE TABLE IF EXISTS models');
+        DB::connection('clickhouse')->statement('
+            CREATE TABLE IF NOT EXISTS models (
+                dt   Date DEFAULT toDate(ts),
+                ts   DateTime,
+                id   UInt32,
+                name String
+            ) ENGINE = MergeTree (dt, (id, dt), 8192);
+        ');
+        DB::connection('clickhouse')->insert(
+            'models',
+            ['ts' => time(), 'id' => 321, 'name' => 'Cool Name']
+        );
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => 321, 'status' => $status = mt_rand(200, 599)]
+        );
+
+        // Act
+        $record = DB::connection('clickhouse')
+                ->table('analytics')
+                ->join('models', 'models.id', '=', 'analytics.analytic_id')
+                ->selectRaw('models.name as name, analytics.status as status')
+                ->first();
+
+        // Assert
+        self::assertEquals($record['name'], 'Cool Name');
+        self::assertEquals($record['status'], $status);
+        DB::connection('clickhouse')->statement('TRUNCATE TABLE IF EXISTS models');
+    }
 }
