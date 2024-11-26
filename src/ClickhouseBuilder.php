@@ -113,7 +113,7 @@ class ClickhouseBuilder extends Builder
      * @param array $bindings
      * @return array
      */
-    protected function cleanBindings(array $bindings): array
+    public function cleanBindings(array $bindings): array
     {
         return array_filter($bindings, static function ($binding) {
             return !$binding instanceof Expression;
