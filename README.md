@@ -28,7 +28,7 @@ You can install the package via composer:
         }
     ],
     "require": {
-        "patoui/laravel-clickhouse": "dev-master"
+        "patoui/laravel-clickhouse": "dev-main"
     }
 }
 ```
