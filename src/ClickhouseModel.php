@@ -10,4 +10,9 @@ class ClickhouseModel extends Model
 {
     public $timestamps   = false;
     public $incrementing = false;
+
+    public function getConnectionName()
+    {
+        return config('database.connections.clickhouse.name', 'clickhouse');
+    }
 }
