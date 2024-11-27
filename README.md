@@ -59,6 +59,28 @@ Add connection details
 
 Use as you normally would an eloquent model or query builder.
 
+Set the connection name on the model
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Patoui\LaravelClickhouse\ClickhouseModel;
+
+class Analytic extends ClickhouseModel
+{
+    protected $guarded = [];
+
+    public function getConnectionName()
+    {
+        return 'clickhouse';
+    }
+}
+```
+
 See `tests` directory for additional examples
 
 Below is a list of currently untested methods or functionality. This does not mean that they won't work, just that there is currently no test coverage.
