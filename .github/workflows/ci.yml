@@ -6,7 +6,8 @@ on:
       - '**'
 
 jobs:
-  test:
+  main:
+    name: Lint and Test
     runs-on: ubuntu-latest
 
     steps:
