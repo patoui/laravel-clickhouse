@@ -10,7 +10,6 @@ use Illuminate\Database\Query\Expression;
 class ClickhouseBuilder extends Builder
 {
     /**
-
      * Retrieve the "count" result of the query.
      *
      * @param  string  $columns
