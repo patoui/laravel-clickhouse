@@ -127,6 +127,20 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
+### Local testing
+
+**Requirements**
+
+- [Docker](https://www.docker.com/)
+
+Once Docker is running, run the following commands:
+
+```
+composer up <-- starts the docker containers, PHP and ClickHouse
+composer in <-- install composer dependencies in the PHP container
+composer test <-- run the test suite
+```
+
 ### Security
 
 If you discover any security related issues, please email patrique.ouimet@gmail.com instead of using the issue tracker.
