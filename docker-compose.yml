@@ -1,7 +1,5 @@
-version: '3'
 services:
 
-  #PHP Service
   app:
     build:
       context: .
@@ -21,9 +19,10 @@ services:
 
   clickhouse:
     container_name: lc_clickhouse
-    image: yandex/clickhouse-server
+    image: clickhouse/clickhouse-server:latest
     ports:
-      - "8123:8123"
+      - "8123:8123" # HTTP interface
+      - "9000:9000" # Native client interface
     volumes:
       - ./clickhouse:/var/lib/clickhouse
     networks:
