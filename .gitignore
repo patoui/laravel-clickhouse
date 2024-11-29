@@ -5,3 +5,6 @@ vendor
 coverage
 clickhouse
 .phpunit.result.cache
+.php_cs.cache
+.DS_Store
+.idea

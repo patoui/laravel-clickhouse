@@ -6,6 +6,4 @@ namespace Patoui\LaravelClickhouse;
 
 use Illuminate\Database\Query\Processors\Processor;
 
-class ClickhouseProcessor extends Processor
-{
-}
+class ClickhouseProcessor extends Processor {}

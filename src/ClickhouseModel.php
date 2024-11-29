@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClickhouseModel extends Model
 {
-    public $timestamps   = false;
+    public $timestamps = false;
     public $incrementing = false;
 
     public function getConnectionName()

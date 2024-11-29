@@ -24,7 +24,8 @@
     },
     "require-dev": {
         "orchestra/testbench": "^9.0",
-        "phpunit/phpunit": "^11.0"
+        "phpunit/phpunit": "^11.0",
+        "tightenco/duster": "^3.0"
     },
     "autoload": {
         "psr-4": {
@@ -37,6 +38,8 @@
         }
     },
     "scripts": {
+        "lint": "vendor/bin/duster lint",
+        "fix": "vendor/bin/duster fix",
         "up": "docker compose up -d",
         "down": "docker compose down",
         "in": "docker exec -it lc_php /bin/bash -c \"composer install\"",

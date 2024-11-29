@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 class QueryTest extends TestCase
 {
-    public function testInsert(): void
+    /**
+     * @test
+     */
+    public function insert(): void
     {
         // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
@@ -18,18 +21,24 @@ class QueryTest extends TestCase
         );
     }
 
-    public function testTableInsert(): void
+    /**
+     * @test
+     */
+    public function tableInsert(): void
     {
         // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
         DB::connection('clickhouse')->table('analytics')->insert([
-            'ts'          => time(),
+            'ts' => time(),
             'analytic_id' => 321,
-            'status'      => 204,
+            'status' => 204,
         ]);
     }
 
-    public function testWhere(): void
+    /**
+     * @test
+     */
+    public function where(): void
     {
         // Arrange
         DB::connection('clickhouse')->insert(
@@ -51,7 +60,10 @@ class QueryTest extends TestCase
         );
     }
 
-    public function testMultipleWheres(): void
+    /**
+     * @test
+     */
+    public function multipleWheres(): void
     {
         // Arrange
         DB::connection('clickhouse')->insert(
@@ -74,7 +86,10 @@ class QueryTest extends TestCase
         );
     }
 
-    public function testSelect(): void
+    /**
+     * @test
+     */
+    public function select(): void
     {
         // Arrange
         DB::connection('clickhouse')->insert(
@@ -88,15 +103,16 @@ class QueryTest extends TestCase
 
         // Act
         $records = DB::connection('clickhouse')
-                ->table('analytics')
-                ->select('ts', 'status')
-                ->get()
-                ->toArray();
+            ->table('analytics')
+            ->select('ts', 'status')
+            ->get()
+            ->toArray();
         // ensure order of records
         usort($records, static function ($a, $b) {
             if ($a['status'] === $b['status']) {
                 return 0;
             }
+
             return ($a['status'] < $b['status']) ? -1 : 1;
         });
 
@@ -107,7 +123,10 @@ class QueryTest extends TestCase
         self::assertEquals($row2['status'], $records[1]['status']);
     }
 
-    public function testSelectRaw(): void
+    /**
+     * @test
+     */
+    public function selectRaw(): void
     {
         // Arrange
         DB::connection('clickhouse')->insert(
@@ -117,15 +136,18 @@ class QueryTest extends TestCase
 
         // Act
         $record = DB::connection('clickhouse')
-                ->table('analytics')
-                ->selectRaw('toMonth(dt) as month_number')
-                ->first();
+            ->table('analytics')
+            ->selectRaw('toMonth(dt) as month_number')
+            ->first();
 
         // Assert
         self::assertEquals($record['month_number'], idate('m'));
     }
 
-    public function testJoin(): void
+    /**
+     * @test
+     */
+    public function join(): void
     {
         // Arrange
         DB::connection('clickhouse')->statement('TRUNCATE TABLE IF EXISTS models');
@@ -151,10 +173,10 @@ class QueryTest extends TestCase
 
         // Act
         $record = DB::connection('clickhouse')
-                ->table('analytics')
-                ->join('models', 'models.id', '=', 'analytics.analytic_id')
-                ->selectRaw('models.name as name, analytics.status as status')
-                ->first();
+            ->table('analytics')
+            ->join('models', 'models.id', '=', 'analytics.analytic_id')
+            ->selectRaw('models.name as name, analytics.status as status')
+            ->first();
 
         // Assert
         self::assertEquals($record['name'], 'Cool Name');

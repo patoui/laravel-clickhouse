@@ -19,7 +19,6 @@ class ClickhouseConnection extends BaseConnection
 
     /**
      * Connection constructor.
-     * @param array $config
      */
     public function __construct(array $config)
     {
@@ -34,7 +33,6 @@ class ClickhouseConnection extends BaseConnection
 
     /**
      * Get SeasClick client
-     * @return SeasClick
      */
     public function getClient(): SeasClick
     {
@@ -44,19 +42,17 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Begin a fluent query against a database table.
      *
-     * @param Closure|Builder|string $table
-     * @param string|null            $as
+     * @param  Closure|Builder|string  $table
+     * @param  string|null  $as
      * @return Builder
      */
-//    public function table($table, $as = null): Builder
-//    {
-//        $this->notImplementedException();
-//    }
+    //    public function table($table, $as = null): Builder
+    //    {
+    //        $this->notImplementedException();
+    //    }
 
     /**
      * Get a new query builder instance.
-     *
-     * @return ClickhouseBuilder
      */
     public function query(): ClickhouseBuilder
     {
@@ -67,45 +63,33 @@ class ClickhouseConnection extends BaseConnection
 
     /**
      * Get the query post processor used by the connection.
-     *
-     * @return Processor
      */
     public function getDefaultPostProcessor(): Processor
     {
-        return new ClickhouseProcessor();
-    }
-
-    /**
-     * Get the default query grammar instance.
-     *
-     * @return ClickhouseGrammar
-     */
-    protected function getDefaultQueryGrammar(): ClickhouseGrammar
-    {
-        return new ClickhouseGrammar();
+        return new ClickhouseProcessor;
     }
 
     /**
      * Run a select statement and return a single result.
      *
-     * @param string $query
-     * @param array  $bindings
-     * @param bool   $useReadPdo
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
      * @return mixed
      */
     public function selectOne($query, $bindings = [], $useReadPdo = true)
     {
         $records = $this->db->select($query, $bindings);
+
         return array_shift($records);
     }
 
     /**
      * Run a select statement against the database.
      *
-     * @param string $query
-     * @param array  $bindings
-     * @param bool   $useReadPdo
-     * @return array
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
      */
     public function select($query, $bindings = [], $useReadPdo = true): array
     {
@@ -115,10 +99,9 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Run a select statement against the database and returns a generator.
      *
-     * @param string $query
-     * @param array  $bindings
-     * @param bool   $useReadPdo
-     * @return Generator
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
      */
     public function cursor($query, $bindings = [], $useReadPdo = true): Generator
     {
@@ -128,22 +111,21 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Run an insert statement against the database.
      *
-     * @param string $query Query is table name
-     * @param array  $bindings
-     * @return bool
+     * @param  string  $query  Query is table name
+     * @param  array  $bindings
      */
     public function insert($query, $bindings = []): bool
     {
         [$keys, $values] = $this->parseBindings($bindings);
+
         return $this->db->insert($query, $keys, $values);
     }
 
     /**
      * Run an update statement against the database.
      *
-     * @param string $query
-     * @param array  $bindings
-     * @return int
+     * @param  string  $query
+     * @param  array  $bindings
      */
     public function update($query, $bindings = []): int
     {
@@ -154,9 +136,8 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Run a delete statement against the database.
      *
-     * @param string $query
-     * @param array  $bindings
-     * @return int
+     * @param  string  $query
+     * @param  array  $bindings
      */
     public function delete($query, $bindings = []): int
     {
@@ -167,9 +148,8 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Execute an SQL statement and return the boolean result.
      *
-     * @param string $query
-     * @param array  $bindings
-     * @return bool
+     * @param  string  $query
+     * @param  array  $bindings
      */
     public function statement($query, $bindings = []): bool
     {
@@ -179,9 +159,8 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Run an SQL statement and get the number of rows affected.
      *
-     * @param string $query
-     * @param array  $bindings
-     * @return int
+     * @param  string  $query
+     * @param  array  $bindings
      */
     public function affectingStatement($query, $bindings = []): int
     {
@@ -191,8 +170,7 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Run a raw, unprepared query against the PDO connection.
      *
-     * @param string $query
-     * @return bool
+     * @param  string  $query
      */
     public function unprepared($query): bool
     {
@@ -202,7 +180,6 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Prepare the query bindings for execution.
      *
-     * @param array $bindings
      * @return array
      */
     public function prepareBindings(array $bindings)
@@ -213,8 +190,8 @@ class ClickhouseConnection extends BaseConnection
     /**
      * Execute a Closure within a transaction.
      *
-     * @param callback|Closure $callback
-     * @param int              $attempts
+     * @param  callable|Closure  $callback
+     * @param  int  $attempts
      * @return mixed
      *
      * @throws Throwable
@@ -226,8 +203,6 @@ class ClickhouseConnection extends BaseConnection
 
     /**
      * Start a new database transaction.
-     *
-     * @return void
      */
     public function beginTransaction(): void
     {
@@ -236,8 +211,6 @@ class ClickhouseConnection extends BaseConnection
 
     /**
      * Commit the active database transaction.
-     *
-     * @return void
      */
     public function commit(): void
     {
@@ -248,7 +221,6 @@ class ClickhouseConnection extends BaseConnection
      * Rollback the active database transaction.
      *
      * @param  int|null  $toLevel
-     * @return void
      */
     public function rollBack($toLevel = null): void
     {
@@ -267,9 +239,6 @@ class ClickhouseConnection extends BaseConnection
 
     /**
      * Execute the given callback in "dry run" mode.
-     *
-     * @param Closure $callback
-     * @return array
      */
     public function pretend(Closure $callback): array
     {
@@ -277,16 +246,24 @@ class ClickhouseConnection extends BaseConnection
     }
 
     /**
-     * @param array $bindings  i.e. [['name' => 'John', 'user_id' => 321]]
-     * @return array<array>  [['name', 'user_id'], [['John', 321]]]
+     * Get the default query grammar instance.
+     */
+    protected function getDefaultQueryGrammar(): ClickhouseGrammar
+    {
+        return new ClickhouseGrammar;
+    }
+
+    /**
+     * @param  array  $bindings  i.e. [['name' => 'John', 'user_id' => 321]]
+     * @return array<array> [['name', 'user_id'], [['John', 321]]]
      */
     private function parseBindings(array $bindings): array
     {
-        if (!$bindings) {
+        if (! $bindings) {
             return [[], []];
         }
 
-        if (!is_string(current(array_flip($bindings)))) {
+        if (! is_string(current(array_flip($bindings)))) {
             throw new InvalidArgumentException(
                 "Keys must be strings, i.e. ['name' => 'John', 'user_id' => 321]"
             );

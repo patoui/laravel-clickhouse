@@ -8,14 +8,20 @@ use Illuminate\Support\Facades\DB;
 
 class ModelTest extends TestCase
 {
-    public function testCreate(): void
+    /**
+     * @test
+     */
+    public function create(): void
     {
         // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
         Analytic::create(['ts' => time(), 'analytic_id' => 321, 'status' => 204]);
     }
 
-    public function testCreateCount(): void
+    /**
+     * @test
+     */
+    public function createCount(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => 321, 'status' => 204]);
@@ -25,7 +31,10 @@ class ModelTest extends TestCase
         self::assertEquals(2, Analytic::count());
     }
 
-    public function testWhere(): void
+    /**
+     * @test
+     */
+    public function where(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
@@ -38,7 +47,10 @@ class ModelTest extends TestCase
         );
     }
 
-    public function testWhereString(): void
+    /**
+     * @test
+     */
+    public function whereString(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599), 'name' => 'page_view']);
@@ -51,7 +63,10 @@ class ModelTest extends TestCase
         );
     }
 
-    public function testMultipleWhere(): void
+    /**
+     * @test
+     */
+    public function multipleWhere(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
@@ -61,12 +76,15 @@ class ModelTest extends TestCase
         self::assertSame(
             2,
             Analytic::where('ts', '>', strtotime('-1 day'))
-                    ->where('ts', '<', strtotime('+1 day'))
-                    ->count()
+                ->where('ts', '<', strtotime('+1 day'))
+                ->count()
         );
     }
 
-    public function testUpdate(): void
+    /**
+     * @test
+     */
+    public function update(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => 123, 'status' => 204, 'name' => 'page_view']);
@@ -75,17 +93,17 @@ class ModelTest extends TestCase
         self::assertSame(
             1,
             Analytic::where('name', 'page_view')
-                    ->where('status', 204)
-                    ->count()
+                ->where('status', 204)
+                ->count()
         );
 
         // Act
         Analytic::where('name', 'page_view')
-                ->where('status', 204)
-                ->update([
-                    'name'   => 'page_visit',
-                    'status' => 200,
-                ]);
+            ->where('status', 204)
+            ->update([
+                'name' => 'page_visit',
+                'status' => 200,
+            ]);
 
         // Needed to prevent race condition failure
         usleep(100000);
@@ -94,25 +112,28 @@ class ModelTest extends TestCase
         self::assertSame(
             1,
             Analytic::where('name', 'page_visit')
-                    ->where('status', 200)
-                    ->count()
+                ->where('status', 200)
+                ->count()
         );
     }
 
-    public function testJsonExtract(): void
+    /**
+     * @test
+     */
+    public function jsonExtract(): void
     {
         // Arrange
         Analytic::create([
-            'ts'          => time(),
+            'ts' => time(),
             'analytic_id' => 123,
-            'status'      => 200,
-            'name'        => json_encode(['action' => 'page_visit', 'referer' => ['https://google.com/']]),
+            'status' => 200,
+            'name' => json_encode(['action' => 'page_visit', 'referer' => ['https://google.com/']]),
         ]);
         Analytic::create([
-            'ts'          => time(),
+            'ts' => time(),
             'analytic_id' => 124,
-            'status'      => 200,
-            'name'        => json_encode(['action' => 'page_view', 'referer' => ['https://duckduckgo.com/']]),
+            'status' => 200,
+            'name' => json_encode(['action' => 'page_view', 'referer' => ['https://duckduckgo.com/']]),
         ]);
 
         // Act

@@ -12,7 +12,7 @@ class ClickhouseBuilder extends Builder
     /**
      * Retrieve the "count" result of the query.
      *
-     * @param string $columns
+     * @param  string  $columns
      * @return int
      */
     public function count($columns = null)
@@ -20,18 +20,15 @@ class ClickhouseBuilder extends Builder
         return parent::count($columns ?: []);
     }
 
-    /**
-     * @return array
-     */
     public function getBindings(): array
     {
         $bindings = [];
-        $keys     = [];
+        $keys = [];
 
         foreach ($this->wheres as &$where) {
-            if (!empty($where['value']) && !$where['value'] instanceof Expression) {
+            if (! empty($where['value']) && ! $where['value'] instanceof Expression) {
                 $col = $where['column'];
-                if (!isset($keys[$col])) {
+                if (! isset($keys[$col])) {
                     $keys[$col] = 0;
                 }
 
@@ -48,9 +45,6 @@ class ClickhouseBuilder extends Builder
 
     /**
      * Insert a new record into the database.
-     *
-     * @param array $values
-     * @return bool
      */
     public function insert(array $values): bool
     {
@@ -61,7 +55,7 @@ class ClickhouseBuilder extends Builder
             return true;
         }
 
-        if (!is_array(reset($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -88,7 +82,6 @@ class ClickhouseBuilder extends Builder
     /**
      * Update a record in the database.
      *
-     * @param  array  $values
      * @return int
      */
     public function update(array $values)
@@ -109,14 +102,11 @@ class ClickhouseBuilder extends Builder
 
     /**
      * Remove all of the expressions from a list of bindings.
-     *
-     * @param array $bindings
-     * @return array
      */
     public function cleanBindings(array $bindings): array
     {
         return array_filter($bindings, static function ($binding) {
-            return !$binding instanceof Expression;
+            return ! $binding instanceof Expression;
         });
     }
 }
