@@ -2,26 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Patoui\LaravelClickhouse\Tests;
+namespace Patoui\LaravelClickhouse\Tests\Feature;
 
 use Illuminate\Support\Facades\DB;
+use Patoui\LaravelClickhouse\Tests\Models\Analytic;
+use Patoui\LaravelClickhouse\Tests\TestCase;
 
 class ModelTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function create(): void
+    public function test_create(): void
     {
         // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
         Analytic::create(['ts' => time(), 'analytic_id' => 321, 'status' => 204]);
     }
 
-    /**
-     * @test
-     */
-    public function createCount(): void
+    public function test_create_count(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => 321, 'status' => 204]);
@@ -31,10 +27,7 @@ class ModelTest extends TestCase
         self::assertEquals(2, Analytic::count());
     }
 
-    /**
-     * @test
-     */
-    public function where(): void
+    public function test_where(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
@@ -47,10 +40,7 @@ class ModelTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function whereString(): void
+    public function test_where_string(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599), 'name' => 'page_view']);
@@ -63,10 +53,7 @@ class ModelTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function multipleWhere(): void
+    public function test_multiple_where(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
@@ -81,10 +68,7 @@ class ModelTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function update(): void
+    public function test_update(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => 123, 'status' => 204, 'name' => 'page_view']);
@@ -117,10 +101,7 @@ class ModelTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function jsonExtract(): void
+    public function test_json_extract(): void
     {
         // Arrange
         Analytic::create([
