@@ -49,4 +49,6 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run PHPUnit
+        env:
+          APP_ENV: ci
         run: vendor/bin/phpunit

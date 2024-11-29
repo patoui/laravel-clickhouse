@@ -60,11 +60,12 @@ class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app): void
     {
+        echo sprintf("APP ENV: %s\n", env('APP_ENV') ?: 'not set');
         $app['config']->set('app.key', '603046c97f00a193540915');
         $app['config']->set('database.default', 'clickhouse');
         $app['config']->set('database.connections.clickhouse', [
             'driver'   => 'clickhouse',
-            'host'     => 'lc_clickhouse',
+            'host'     => env('APP_ENV') === 'ci' ? 'localhost' : 'lc_clickhouse',
             'port'     => '9000',
             'username' => 'default',
             'password' => '',
