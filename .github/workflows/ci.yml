@@ -28,7 +28,7 @@ jobs:
           ACCEPT_PECL_LICENSE: 'yes'
 
       - name: Enable SeasClick extension
-        run: echo "extension=seasclick.so" | sudo tee /etc/php/8.3/cli/conf.d/30-seasclick.ini
+        run: echo "extension=SeasClick.so" | sudo tee /etc/php/8.3/cli/conf.d/30-seasclick.ini
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
