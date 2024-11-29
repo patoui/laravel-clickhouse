@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y php-pear php-dev gcc make
-          sudo pecl install seasclick
+          yes "" | sudo pecl install -q seasclick
         env:
           ACCEPT_PECL_LICENSE: 'yes'
 
