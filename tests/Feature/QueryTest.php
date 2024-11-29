@@ -9,10 +9,7 @@ use Patoui\LaravelClickhouse\Tests\TestCase;
 
 class QueryTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function insert(): void
+    public function test_insert(): void
     {
         // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
@@ -22,10 +19,7 @@ class QueryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function table_insert(): void
+    public function test_table_insert(): void
     {
         // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
@@ -36,10 +30,7 @@ class QueryTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function where(): void
+    public function test_where(): void
     {
         // Arrange
         DB::connection('clickhouse')->insert(
@@ -61,10 +52,7 @@ class QueryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function multiple_wheres(): void
+    public function test_multiple_wheres(): void
     {
         // Arrange
         DB::connection('clickhouse')->insert(
@@ -87,10 +75,7 @@ class QueryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function select(): void
+    public function test_select(): void
     {
         // Arrange
         DB::connection('clickhouse')->insert(
@@ -124,10 +109,7 @@ class QueryTest extends TestCase
         self::assertEquals($row2['status'], $records[1]['status']);
     }
 
-    /**
-     * @test
-     */
-    public function select_raw(): void
+    public function test_select_raw(): void
     {
         // Arrange
         DB::connection('clickhouse')->insert(
@@ -145,10 +127,7 @@ class QueryTest extends TestCase
         self::assertEquals($record['month_number'], idate('m'));
     }
 
-    /**
-     * @test
-     */
-    public function join(): void
+    public function test_join(): void
     {
         // Arrange
         DB::connection('clickhouse')->statement('TRUNCATE TABLE IF EXISTS models');

@@ -10,20 +10,14 @@ use Patoui\LaravelClickhouse\Tests\TestCase;
 
 class ModelTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function create(): void
+    public function test_create(): void
     {
         // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
         Analytic::create(['ts' => time(), 'analytic_id' => 321, 'status' => 204]);
     }
 
-    /**
-     * @test
-     */
-    public function create_count(): void
+    public function test_create_count(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => 321, 'status' => 204]);
@@ -33,10 +27,7 @@ class ModelTest extends TestCase
         self::assertEquals(2, Analytic::count());
     }
 
-    /**
-     * @test
-     */
-    public function where(): void
+    public function test_where(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
@@ -49,10 +40,7 @@ class ModelTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function where_string(): void
+    public function test_where_string(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599), 'name' => 'page_view']);
@@ -65,10 +53,7 @@ class ModelTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function multiple_where(): void
+    public function test_multiple_where(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
@@ -83,10 +68,7 @@ class ModelTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function update(): void
+    public function test_update(): void
     {
         // Arrange
         Analytic::create(['ts' => time(), 'analytic_id' => 123, 'status' => 204, 'name' => 'page_view']);
@@ -119,10 +101,7 @@ class ModelTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function json_extract(): void
+    public function test_json_extract(): void
     {
         // Arrange
         Analytic::create([
