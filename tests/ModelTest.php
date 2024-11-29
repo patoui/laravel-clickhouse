@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Patoui\LaravelClickhouse\Tests;
 
 use Illuminate\Support\Facades\DB;

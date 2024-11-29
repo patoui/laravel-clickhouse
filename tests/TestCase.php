@@ -35,7 +35,10 @@ class TestCase extends BaseTestCase
                 analytic_id     UInt32,
                 status          UInt16,
                 name            String DEFAULT \'\'
-            ) ENGINE = MergeTree (dt, (analytic_id, dt), 8192);
+            )
+            ENGINE = MergeTree
+            PARTITION BY dt
+            ORDER BY (analytic_id, dt);
         ');
     }
 
@@ -60,6 +63,7 @@ class TestCase extends BaseTestCase
         $app['config']->set('app.key', '603046c97f00a193540915');
         $app['config']->set('database.default', 'clickhouse');
         $app['config']->set('database.connections.clickhouse', [
+            'driver'   => 'clickhouse',
             'host'     => 'lc_clickhouse',
             'port'     => '9000',
             'username' => 'default',

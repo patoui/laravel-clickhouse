@@ -4,3 +4,4 @@ docs
 vendor
 coverage
 clickhouse
+.phpunit.result.cache

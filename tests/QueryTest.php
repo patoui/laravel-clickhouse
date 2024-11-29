@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Patoui\LaravelClickhouse\Tests;
 
 use Illuminate\Support\Facades\DB;
@@ -133,7 +135,10 @@ class QueryTest extends TestCase
                 ts   DateTime,
                 id   UInt32,
                 name String
-            ) ENGINE = MergeTree (dt, (id, dt), 8192);
+            )
+            ENGINE = MergeTree
+            PARTITION BY dt
+            ORDER BY (id, dt);
         ');
         DB::connection('clickhouse')->insert(
             'models',
