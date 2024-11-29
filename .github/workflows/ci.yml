@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    name: Run PHPUnit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v3
+        with:
+          php-version: '8.3'
+
+      - name: Install SeasClick extension
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-pear php-dev gcc make
+          sudo pecl install seasclick
+        env:
+          ACCEPT_PECL_LICENSE: 'yes'
+
+      - name: Enable SeasClick extension
+        run: echo "extension=seasclick.so" | sudo tee /etc/php/8.2/cli/conf.d/30-seasclick.ini
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
