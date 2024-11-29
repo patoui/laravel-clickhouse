@@ -27,12 +27,18 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main" | sudo tee /etc/apt/sources.list.d/clickhouse.list
           sudo apt-get update
           sudo apt-get install -y clickhouse-server clickhouse-client
+
+          # Configure default user
+          sudo sed -i 's|<password>.*</password>|<password></password>|' /etc/clickhouse-server/users.xml
+          sudo sed -i 's|<networks>.*</networks>|<networks><ip>::/0</ip></networks>|' /etc/clickhouse-server/users.xml
+
+          # Start ClickHouse server
           sudo service clickhouse-server start
 
       - name: Install SeasClick extension
         run: |
           sudo apt-get install -y php-pear php-dev gcc make
-          printf "\n" | sudo pecl install seasclick
+          sudo pecl install seasclick
         env:
           ACCEPT_PECL_LICENSE: 'yes'
 
