@@ -32,7 +32,7 @@ jobs:
       - name: Install SeasClick extension
         run: |
           sudo apt-get install -y php-pear php-dev gcc make
-          yes "" | sudo pecl install -q seasclick
+          printf "\n" | sudo pecl install seasclick
         env:
           ACCEPT_PECL_LICENSE: 'yes'
 
