@@ -66,7 +66,6 @@ Below is a list of currently untested methods or functionality. This does not me
 - `whereBetween`
 - `whereNotBetween`
 - `whereIn` or `whereNotIn`
-- `whereNull` or `whereNotNull`
 - `whereDate`, `whereMonth`, `whereDay`, `whereYear`, `whereTime`
 - `orWhereColumn`
 - `whereExists`

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Patoui\LaravelClickhouse\Tests;
 
 use Illuminate\Foundation\Application;
@@ -34,6 +36,7 @@ class TestCase extends BaseTestCase
                 ts              DateTime,
                 analytic_id     UInt32,
                 status          UInt16,
+                label           Nullable(String),
                 name            String DEFAULT \'\'
             )
             ENGINE = MergeTree

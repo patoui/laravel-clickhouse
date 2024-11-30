@@ -53,6 +53,36 @@ class ModelTest extends TestCase
         );
     }
 
+    public function test_where_null(): void
+    {
+        // Arrange
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599), 'name' => 'not_null', 'label' => 'Page View']);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599), 'name' => 'null']);
+
+        // Act & Assert
+        $analyticsQuery = Analytic::whereNull('label');
+        self::assertSame(1, $analyticsQuery->count());
+        self::assertSame(
+            'null',
+            $analyticsQuery->value('name'),
+        );
+    }
+
+    public function test_where_not_null(): void
+    {
+        // Arrange
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599), 'name' => 'not_null', 'label' => 'Page View']);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599), 'name' => 'null']);
+
+        // Act & Assert
+        $analyticsQuery = Analytic::whereNotNull('label');
+        self::assertSame(1, $analyticsQuery->count());
+        self::assertSame(
+            'not_null',
+            $analyticsQuery->value('name'),
+        );
+    }
+
     public function test_multiple_where(): void
     {
         // Arrange
