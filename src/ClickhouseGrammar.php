@@ -183,7 +183,7 @@ class ClickhouseGrammar extends Grammar
      */
     protected function whereNull(Builder $query, $where)
     {
-        return $this->wrap($where['column']) . ' is null';
+        return sprintf('isNull(%s)', $this->wrap($where['column']));
     }
 
     /**
@@ -194,7 +194,7 @@ class ClickhouseGrammar extends Grammar
      */
     protected function whereNotNull(Builder $query, $where)
     {
-        return $this->wrap($where['column']) . ' is not null';
+        return sprintf('isNotNull(%s)', $this->wrap($where['column']));
     }
 
     /**
