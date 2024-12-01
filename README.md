@@ -65,7 +65,7 @@ Below is a list of currently untested methods or functionality. This does not me
 - `whereJsonLength`
 - `whereBetween`
 - `whereNotBetween`
-- `whereIn` or `whereNotIn`
+- `whereNotIn`
 - `whereDate`, `whereMonth`, `whereDay`, `whereYear`, `whereTime`
 - `orWhereColumn`
 - `whereExists`

@@ -83,6 +83,27 @@ class ModelTest extends TestCase
         );
     }
 
+    public function test_where_in(): void
+    {
+        // Arrange
+        $ok = 200;
+        $created = 201;
+        $accepted = 202;
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => $ok, 'name' => 'not_null', 'label' => 'Page View']);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => $created, 'name' => 'not_null', 'label' => 'Page View']);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => $accepted, 'name' => 'not_null', 'label' => 'Page View']);
+
+        // Act & Assert
+        $analyticsQuery = Analytic::whereIn('status', [$ok, $accepted]);
+        self::assertSame(
+            2,
+            $analyticsQuery->count(),
+        );
+        $analytics = $analyticsQuery->get()->sortBy('status')->values();
+        self::assertSame($ok, $analytics[0]->status);
+        self::assertSame($accepted, $analytics[1]->status);
+    }
+
     public function test_multiple_where(): void
     {
         // Arrange
