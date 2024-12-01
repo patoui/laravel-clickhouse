@@ -104,6 +104,25 @@ class ModelTest extends TestCase
         self::assertSame($accepted, $analytics[1]->status);
     }
 
+    public function test_where_not_in(): void
+    {
+        // Arrange
+        $ok = 200;
+        $created = 201;
+        $accepted = 202;
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => $ok, 'name' => 'not_null', 'label' => 'Page View']);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => $created, 'name' => 'not_null', 'label' => 'Page View']);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => $accepted, 'name' => 'not_null', 'label' => 'Page View']);
+
+        // Act & Assert
+        $analyticsQuery = Analytic::whereNotIn('status', [$ok, $accepted]);
+        self::assertSame(
+            1,
+            $analyticsQuery->count(),
+        );
+        self::assertSame($created, $analyticsQuery->first()->status);
+    }
+
     public function test_multiple_where(): void
     {
         // Arrange
