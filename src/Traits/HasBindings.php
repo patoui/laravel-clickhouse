@@ -9,6 +9,12 @@ trait HasBindings
     public ?string $binding_key = null;
     public ?array $binding_keys = null;
 
+    public function resetBindingKeys(): void
+    {
+        $this->binding_key = null;
+        $this->binding_keys = null;
+    }
+
     protected function nextBindingKey(mixed $value): string
     {
         $hash = md5(json_encode($value));
@@ -35,12 +41,6 @@ trait HasBindings
         }
 
         return $this->binding_key;
-    }
-
-    public function resetBindingKeys(): void
-    {
-        $this->binding_key = null;
-        $this->binding_keys = null;
     }
 
     protected function flattenWithKeys(array $data): array
