@@ -4,43 +4,46 @@ declare(strict_types=1);
 
 namespace Patoui\LaravelClickhouse;
 
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use InvalidArgumentException;
+use Patoui\LaravelClickhouse\Traits\HasBindings;
 
 class ClickhouseBuilder extends Builder
 {
+    use HasBindings;
+
+    /**
+     * Create a new query builder instance.
+     *
+     * @return void
+     */
+    public function __construct(
+        ConnectionInterface $connection,
+        ?Grammar $grammar = null,
+        ?Processor $processor = null,
+    ) {
+        parent::__construct($connection, $grammar, $processor);
+
+        $this->grammar->resetBindingKeys();
+    }
+
     /**
      * Retrieve the "count" result of the query.
      *
      * @param  string  $columns
-     * @return int
      */
-    public function count($columns = null)
+    public function count($columns = null): int
     {
         return parent::count($columns ?: []);
     }
 
     public function getBindings(): array
     {
-        $bindings = [];
-        $keys = [];
-
-        foreach ($this->wheres as &$where) {
-            if (! empty($where['value']) && ! $where['value'] instanceof Expression) {
-                $col = $where['column'];
-                if (! isset($keys[$col])) {
-                    $keys[$col] = 0;
-                }
-
-                $where['column'] .= ($keys[$col] ?: '');
-
-                $bindings[$where['column']] = $where['value'];
-
-                $keys[$col]++;
-            }
-        }
-
-        return $bindings;
+        return $this->flattenWithKeys($this->bindings);
     }
 
     /**
@@ -81,23 +84,15 @@ class ClickhouseBuilder extends Builder
 
     /**
      * Update a record in the database.
-     *
-     * @return int
      */
-    public function update(array $values)
+    public function update(array $values): int
     {
-        $sql = $this->grammar->compileUpdate($this, $values);
-
-        $prepared_wheres = [];
-        for ($i = 0, $max = count($this->wheres); $i < $max; $i++) {
-            $prepared_wheres[$this->wheres[$i]['token']] = $this->bindings['where'][$i];
-        }
-
-        $prepared_bindings = array_merge($this->bindings, ['where' => $prepared_wheres]);
-
-        return $this->connection->update($sql, $this->cleanBindings(
-            $this->grammar->prepareBindingsForUpdate($prepared_bindings, $values)
-        ));
+        return $this->connection->update(
+            $this->grammar->compileUpdate($this, $values),
+            $this->cleanBindings(
+                $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
+            )
+        );
     }
 
     /**
@@ -108,5 +103,29 @@ class ClickhouseBuilder extends Builder
         return array_filter($bindings, static function ($binding) {
             return ! $binding instanceof Expression;
         });
+    }
+
+    /**
+     * Add a binding to the query.
+     *
+     * @param  mixed  $value
+     * @param  string  $type
+     * @return $this
+     *
+     * @throws InvalidArgumentException
+     */
+    public function addBinding($value, $type = 'where'): self
+    {
+        if (! array_key_exists($type, $this->bindings)) {
+            throw new InvalidArgumentException("Invalid binding type: {$type}.");
+        }
+
+        $values = is_array($value) ? $value : [$value];
+
+        foreach ($values as $value) {
+            $this->bindings[$type][$this->nextBindingKey($value)] = $this->castBinding($value);
+        }
+
+        return $this;
     }
 }

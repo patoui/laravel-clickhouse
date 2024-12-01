@@ -6,31 +6,19 @@ namespace Patoui\LaravelClickhouse;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Support\Arr;
+use Patoui\LaravelClickhouse\Traits\HasBindings;
 
 class ClickhouseGrammar extends Grammar
 {
+    use HasBindings;
+
     /**
      * Compile an insert statement into SQL.
      */
     public function compileInsert(Builder $query, array $values): string
     {
         return $this->wrapTable($query->from);
-    }
-
-    /**
-     * Create query parameter place-holders for an array.
-     */
-    public function parameterize(array $values): string
-    {
-        $parameters = [];
-        $key_counts = [];
-        foreach ($values as $key => $value) {
-            $key_count = $key_counts[$key] ?? 0;
-            $parameters[] = $this->parameter($value, $key);
-            $key_counts[$key] = empty($key_counts[$key]) ? 1 : $key_counts[$key] + 1;
-        }
-
-        return implode(', ', $parameters);
     }
 
     /**
@@ -41,50 +29,33 @@ class ClickhouseGrammar extends Grammar
      */
     public function parameter($value, $key = null): string
     {
-        if ($this->isExpression($value)) {
-            return $this->getValue($value);
-        }
+        $parsedValue = $this->isExpression($value) ? $this->getValue($value) : $value;
 
-        $param = '{' . $key . '}';
+        $param = '{' . $this->nextBindingKey($parsedValue) . '}';
 
-        return is_string($value) ? "'{$param}'" : $param;
-    }
-
-    /**
-     * Compile an update statement into SQL.
-     */
-    public function compileUpdate(Builder $query, array $values): string
-    {
-        $table = $this->wrapTable($query->from);
-
-        $columns = $this->compileUpdateColumns($query, $values);
-
-        $where = $this->compileWheres($query);
-
-        return trim(
-            isset($query->joins)
-                ? $this->compileUpdateWithJoins($query, $table, $columns, $where)
-                : $this->compileUpdateWithoutJoins($query, $table, $columns, $where)
-        );
+        return is_string($parsedValue) ? $this->quoteString($param) : $param;
     }
 
     /**
      * Prepare the bindings for an update statement.
+     *
+     * @return array
      */
-    public function prepareBindingsForUpdate(array $bindings, array $values): array
+    public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        foreach ($bindings as $component => $component_bindings) {
-            if (! $component_bindings) {
-                continue;
-            }
-            foreach ($component_bindings as $key => $value) {
-                if (! isset($values[$key])) {
-                    $values[$key] = $value;
-                }
-            }
+        $cleanBindings = Arr::except($bindings, ['select', 'join']);
+
+        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
+
+        $mergedBindings = array_values(array_merge(Arr::flatten($cleanBindings), $values));
+
+        $keyedBindings = [];
+
+        foreach ($mergedBindings as $value) {
+            $keyedBindings[$this->nextBindingKey($value)] = $value;
         }
 
-        return $values;
+        return $keyedBindings;
     }
 
     /**
@@ -106,7 +77,7 @@ class ClickhouseGrammar extends Grammar
      */
     protected function whereBasic(Builder $query, $where)
     {
-        $value = $this->parameter($where['value'], $where['token'] ?? null);
+        $value = $this->parameter($where['value']);
 
         return $this->wrap($where['column']) . ' ' . $where['operator'] . ' ' . $value;
     }
@@ -120,7 +91,7 @@ class ClickhouseGrammar extends Grammar
     protected function whereIn(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            return $this->wrap($where['column']) . ' in (' . $this->parameterize($where['values']) . ')';
+            return $this->wrap($where['column']) . ' in (' . $this->parameterize($where['values'], $where['column']) . ')';
         }
 
         return '0 = 1';
@@ -135,7 +106,7 @@ class ClickhouseGrammar extends Grammar
     protected function whereNotIn(Builder $query, $where)
     {
         if (! empty($where['values'])) {
-            return $this->wrap($where['column']) . ' not in (' . $this->parameterize($where['values']) . ')';
+            return $this->wrap($where['column']) . ' not in (' . $this->parameterize($where['values'], $where['column']) . ')';
         }
 
         return '1 = 1';
@@ -287,35 +258,6 @@ class ClickhouseGrammar extends Grammar
     }
 
     /**
-     * Get an array of all the where clauses for the query.
-     *
-     * @param  Builder  $query
-     */
-    protected function compileWheresToArray($query): array
-    {
-        $compiled_wheres = [];
-        foreach ($query->wheres as $key => $where) {
-            if (isset($where['column'])) {
-                $query->wheres[$key]['token'] = $where['token'] = $this->prepareKey($query, $where['column']);
-            }
-
-            $compiled_wheres[] = $where['boolean'] . ' ' . $this->{"where{$where['type']}"}($query, $where);
-        }
-
-        return $compiled_wheres;
-    }
-
-    /**
-     * Compile the columns for an update statement.
-     */
-    protected function compileUpdateColumns(Builder $query, array $values): string
-    {
-        return collect($values)->map(function ($value, $key) use ($query) {
-            return $this->wrap($key) . ' = ' . $this->parameter($value, $this->prepareKey($query, $key));
-        })->implode(', ');
-    }
-
-    /**
      * Compile an update statement without joins into SQL.
      *
      * @param  string  $table
@@ -325,20 +267,5 @@ class ClickhouseGrammar extends Grammar
     protected function compileUpdateWithoutJoins(Builder $query, $table, $columns, $where): string
     {
         return "alter table {$table} update {$columns} {$where}";
-    }
-
-    /**
-     * Format named parameter key to avoid duplicates
-     */
-    private function prepareKey(Builder $query, string $key): string
-    {
-        if (! isset($query->binding_count[$key])) {
-            $query->binding_count[$key] = 0;
-        }
-        $key_count = ++$query->binding_count[$key];
-        $key_index = $key_count - 1;
-        $key .= ($key_index > 0 ? $key_index : '');
-
-        return $key;
     }
 }
