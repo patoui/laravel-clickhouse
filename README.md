@@ -65,7 +65,7 @@ Below is a list of currently untested methods or functionality. This does not me
 - `whereJsonLength`
 - `whereBetween`
 - `whereNotBetween`
-- `whereDay`, `whereYear`, `whereTime`
+- `whereDay`, `whereTime`
 - `orWhereColumn`
 - `whereExists`
 - Subquery Where Clauses

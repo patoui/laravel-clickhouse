@@ -89,6 +89,23 @@ class ModelTest extends TestCase
         );
     }
 
+    public function test_where_year(): void
+    {
+        // Arrange
+        Analytic::create(['ts' => strtotime('-2 years'), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+
+        // Act & Assert
+        self::assertSame(
+            1,
+            Analytic::whereYear('ts', date('Y'))->count()
+        );
+        self::assertSame(
+            1,
+            Analytic::whereYear('ts', new DateTimeImmutable())->count()
+        );
+    }
+
     public function test_where_null(): void
     {
         // Arrange

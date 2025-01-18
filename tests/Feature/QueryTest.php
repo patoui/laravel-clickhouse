@@ -134,6 +134,35 @@ class QueryTest extends TestCase
         );
     }
 
+    public function test_where_year(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => strtotime('-2 years'), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+
+        // Act & Assert
+        self::assertSame(
+            1,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereYear('ts', date('Y'))
+                ->count()
+        );
+        self::assertSame(
+            1,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereYear('ts', new DateTimeImmutable())
+                ->count()
+        );
+    }
+
     public function test_select(): void
     {
         // Arrange
