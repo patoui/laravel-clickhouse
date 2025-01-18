@@ -81,7 +81,7 @@ class QueryTest extends TestCase
         // Arrange
         DB::connection('clickhouse')->insert(
             'analytics',
-            ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+            ['ts' => strtotime('-1 day'), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
         );
         DB::connection('clickhouse')->insert(
             'analytics',
@@ -90,10 +90,17 @@ class QueryTest extends TestCase
 
         // Act & Assert
         self::assertSame(
-            2,
+            1,
             DB::connection('clickhouse')
                 ->table('analytics')
                 ->whereDate('ts', date('Y-m-d'))
+                ->count()
+        );
+        self::assertSame(
+            1,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereDate('ts', new DateTimeImmutable())
                 ->count()
         );
     }
@@ -116,6 +123,13 @@ class QueryTest extends TestCase
             DB::connection('clickhouse')
                 ->table('analytics')
                 ->whereMonth('ts', date('m'))
+                ->count()
+        );
+        self::assertSame(
+            1,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereMonth('ts', new DateTimeImmutable())
                 ->count()
         );
     }
