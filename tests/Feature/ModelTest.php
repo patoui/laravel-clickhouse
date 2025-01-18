@@ -66,6 +66,19 @@ class ModelTest extends TestCase
         );
     }
 
+    public function test_where_month(): void
+    {
+        // Arrange
+        Analytic::create(['ts' => strtotime('-2 months'), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+
+        // Act & Assert
+        self::assertSame(
+            1,
+            Analytic::whereMonth('ts', date('m'))->count()
+        );
+    }
+
     public function test_where_null(): void
     {
         // Arrange

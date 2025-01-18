@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Patoui\LaravelClickhouse\Tests\Feature;
 
+use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 use Patoui\LaravelClickhouse\Tests\TestCase;
 
@@ -93,6 +94,28 @@ class QueryTest extends TestCase
             DB::connection('clickhouse')
                 ->table('analytics')
                 ->whereDate('ts', date('Y-m-d'))
+                ->count()
+        );
+    }
+
+    public function test_where_month(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => strtotime('-2 months'), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+
+        // Act & Assert
+        self::assertSame(
+            1,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereMonth('ts', date('m'))
                 ->count()
         );
     }

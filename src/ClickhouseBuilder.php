@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Patoui\LaravelClickhouse;
 
+use DateTimeInterface;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
@@ -127,5 +128,42 @@ class ClickhouseBuilder extends Builder
         }
 
         return $this;
+    }
+
+    /**
+     * Add a "where month" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \DateTimeInterface|string|int|null  $operator
+     * @param  \DateTimeInterface|string|int|null  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereMonth($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        // If the given operator is not found in the list of valid operators we will
+        // assume that the developer is just short-cutting the '=' operators and
+        // we will set the operators to '=' and set the values appropriately.
+        if ($this->invalidOperator($operator)) {
+            [$value, $operator] = [$operator, '='];
+        }
+
+        $value = $this->flattenValue($value);
+
+        if ($value instanceof DateTimeInterface) {
+            // modified, no leading zero
+            $value = $value->format('n');
+        }
+
+        if (! $value instanceof Expression) {
+            // modified, no leading zero
+            $value = sprintf('%01d', $value);
+        }
+
+        return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
     }
 }
