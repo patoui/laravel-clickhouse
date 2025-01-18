@@ -53,6 +53,19 @@ class ModelTest extends TestCase
         );
     }
 
+    public function test_where_date(): void
+    {
+        // Arrange
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+
+        // Act & Assert
+        self::assertSame(
+            2,
+            Analytic::whereDate('ts', date('Y-m-d'))->count()
+        );
+    }
+
     public function test_where_null(): void
     {
         // Arrange

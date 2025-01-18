@@ -75,6 +75,28 @@ class QueryTest extends TestCase
         );
     }
 
+    public function test_where_date(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+
+        // Act & Assert
+        self::assertSame(
+            2,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereDate('ts', date('Y-m-d'))
+                ->count()
+        );
+    }
+
     public function test_select(): void
     {
         // Arrange
