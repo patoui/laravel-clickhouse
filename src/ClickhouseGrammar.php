@@ -287,7 +287,7 @@ class ClickhouseGrammar extends Grammar
     {
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
-        return 'JSONExtractString('.$field.$path.')';
+        return 'JSONExtractString(' . $field . $path . ')';
     }
 
     /**
@@ -320,7 +320,7 @@ class ClickhouseGrammar extends Grammar
             $key = Str::beforeLast($segment, $parts[0]);
 
             if (! empty($key)) {
-                return $key.$parts[0];
+                return $key . $parts[0];
             }
 
             return $parts[0];
