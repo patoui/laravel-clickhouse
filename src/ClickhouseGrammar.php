@@ -221,7 +221,14 @@ class ClickhouseGrammar extends Grammar
      */
     protected function whereTime(Builder $query, $where)
     {
-        return $this->dateBasedWhere('time', $query, $where);
+        $value = $this->parameter($where['value']);
+
+        return sprintf(
+            "formatDateTime(%s, '%%H:%%i:%%s') %s %s",
+            $this->wrap($where['column']),
+            $where['operator'],
+            $value
+        );
     }
 
     /**

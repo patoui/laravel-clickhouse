@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Patoui\LaravelClickhouse\Tests\Feature;
 
 use DateTimeImmutable;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
 use Patoui\LaravelClickhouse\Tests\Models\Analytic;
 use Patoui\LaravelClickhouse\Tests\TestCase;
@@ -120,6 +119,27 @@ class ModelTest extends TestCase
         self::assertSame(
             1,
             Analytic::whereYear('ts', new DateTimeImmutable())->count()
+        );
+    }
+
+    public function test_where_time(): void
+    {
+        // Arrange
+        $time = strtotime('-11 minutes');
+        Analytic::create(['ts' => $time, 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+
+        // Act & Assert
+        self::assertSame(
+            1,
+            Analytic::whereTime('ts', date('H:i:s', $time))->count()
+        );
+        self::assertSame(
+            1,
+            Analytic::whereTime(
+                'ts',
+                (new DateTimeImmutable())->setTimestamp($time)
+            )->count()
         );
     }
 

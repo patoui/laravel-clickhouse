@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Patoui\LaravelClickhouse\Tests\Feature;
 
+use DateInterval;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 use Patoui\LaravelClickhouse\Tests\TestCase;
@@ -188,6 +189,36 @@ class QueryTest extends TestCase
             DB::connection('clickhouse')
                 ->table('analytics')
                 ->whereYear('ts', new DateTimeImmutable())
+                ->count()
+        );
+    }
+
+    public function test_where_time(): void
+    {
+        // Arrange
+        $time = strtotime('-11 minutes');
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => $time, 'analytic_id' => 111, 'status' => mt_rand(200, 599)]
+        );
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => 222, 'status' => mt_rand(200, 599)]
+        );
+
+        // Act & Assert
+        self::assertSame(
+            1,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereTime('ts', date('H:i:s', $time))
+                ->count()
+        );
+        self::assertSame(
+            1,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereTime('ts', (new DateTimeImmutable())->setTimestamp($time))
                 ->count()
         );
     }
