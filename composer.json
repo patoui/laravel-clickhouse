@@ -42,9 +42,9 @@
         "fix": "vendor/bin/duster fix",
         "up": "docker compose up -d",
         "down": "docker compose down",
-        "in": "docker exec -it lc_php /bin/bash -c \"composer install\"",
-        "test": "docker exec -it lc_php /bin/bash -c \"vendor/bin/phpunit\"",
-        "test-coverage": "docker exec -it lc_php /bin/bash -c \"vendor/bin/phpunit --coverage-html coverage\"",
+        "in": "docker exec -it lc_php composer install",
+        "test": "docker exec -it lc_php vendor/bin/phpunit \"$@\"",
+        "test-coverage": "docker exec -it lc_php vendor/bin/phpunit --coverage-html coverage",
         "clickhouse": "docker exec -it lc_clickhouse clickhouse --client"
     },
     "config": {
