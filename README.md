@@ -107,7 +107,7 @@ Analytic::where('name', 'page_view')->update(['name' => 'page_visit']);
 Testing is done within docker to simplify setting up Clickhouse
 
 ```bash
-docker-compose up --build
+composer up <-- starts the docker containers, PHP and ClickHouse
 ```
 
 Run the tests:
