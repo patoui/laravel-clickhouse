@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Patoui\LaravelClickhouse\Tests\Feature;
 
-use DateInterval;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 use Patoui\LaravelClickhouse\Tests\TestCase;
@@ -101,7 +100,7 @@ class QueryTest extends TestCase
             1,
             DB::connection('clickhouse')
                 ->table('analytics')
-                ->whereDate('ts', new DateTimeImmutable())
+                ->whereDate('ts', new DateTimeImmutable)
                 ->count()
         );
     }
@@ -130,7 +129,7 @@ class QueryTest extends TestCase
             1,
             DB::connection('clickhouse')
                 ->table('analytics')
-                ->whereDay('ts', new DateTimeImmutable())
+                ->whereDay('ts', new DateTimeImmutable)
                 ->count()
         );
     }
@@ -159,7 +158,7 @@ class QueryTest extends TestCase
             1,
             DB::connection('clickhouse')
                 ->table('analytics')
-                ->whereMonth('ts', new DateTimeImmutable())
+                ->whereMonth('ts', new DateTimeImmutable)
                 ->count()
         );
     }
@@ -188,7 +187,7 @@ class QueryTest extends TestCase
             1,
             DB::connection('clickhouse')
                 ->table('analytics')
-                ->whereYear('ts', new DateTimeImmutable())
+                ->whereYear('ts', new DateTimeImmutable)
                 ->count()
         );
     }
@@ -218,7 +217,7 @@ class QueryTest extends TestCase
             1,
             DB::connection('clickhouse')
                 ->table('analytics')
-                ->whereTime('ts', (new DateTimeImmutable())->setTimestamp($time))
+                ->whereTime('ts', (new DateTimeImmutable)->setTimestamp($time))
                 ->count()
         );
     }

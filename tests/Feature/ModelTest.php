@@ -67,7 +67,7 @@ class ModelTest extends TestCase
         );
         self::assertSame(
             1,
-            Analytic::whereDate('ts', new DateTimeImmutable())->count()
+            Analytic::whereDate('ts', new DateTimeImmutable)->count()
         );
     }
 
@@ -84,7 +84,7 @@ class ModelTest extends TestCase
         );
         self::assertSame(
             1,
-            Analytic::whereDay('ts', new DateTimeImmutable())->count()
+            Analytic::whereDay('ts', new DateTimeImmutable)->count()
         );
     }
 
@@ -101,7 +101,7 @@ class ModelTest extends TestCase
         );
         self::assertSame(
             1,
-            Analytic::whereMonth('ts', new DateTimeImmutable())->count()
+            Analytic::whereMonth('ts', new DateTimeImmutable)->count()
         );
     }
 
@@ -118,7 +118,7 @@ class ModelTest extends TestCase
         );
         self::assertSame(
             1,
-            Analytic::whereYear('ts', new DateTimeImmutable())->count()
+            Analytic::whereYear('ts', new DateTimeImmutable)->count()
         );
     }
 
@@ -138,7 +138,7 @@ class ModelTest extends TestCase
             1,
             Analytic::whereTime(
                 'ts',
-                (new DateTimeImmutable())->setTimestamp($time)
+                (new DateTimeImmutable)->setTimestamp($time)
             )->count()
         );
     }

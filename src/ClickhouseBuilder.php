@@ -134,8 +134,8 @@ class ClickhouseBuilder extends Builder
      * Add a "where month" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  \DateTimeInterface|string|int|null  $operator
-     * @param  \DateTimeInterface|string|int|null  $value
+     * @param  DateTimeInterface|string|int|null  $operator
+     * @param  DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -171,8 +171,8 @@ class ClickhouseBuilder extends Builder
      * Add a "where day" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  \DateTimeInterface|string|int|null  $operator
-     * @param  \DateTimeInterface|string|int|null  $value
+     * @param  DateTimeInterface|string|int|null  $operator
+     * @param  DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
      * @return $this
      */
