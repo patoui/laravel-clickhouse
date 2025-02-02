@@ -72,6 +72,23 @@ class ModelTest extends TestCase
         );
     }
 
+    public function test_where_day(): void
+    {
+        // Arrange
+        Analytic::create(['ts' => strtotime('-1 day'), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+        Analytic::create(['ts' => time(), 'analytic_id' => mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+
+        // Act & Assert
+        self::assertSame(
+            1,
+            Analytic::whereDay('ts', date('d'))->count()
+        );
+        self::assertSame(
+            1,
+            Analytic::whereDay('ts', new DateTimeImmutable())->count()
+        );
+    }
+
     public function test_where_month(): void
     {
         // Arrange
