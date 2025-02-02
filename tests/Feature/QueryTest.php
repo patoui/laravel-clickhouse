@@ -246,6 +246,32 @@ class QueryTest extends TestCase
         );
     }
 
+    public function test_where_json(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->insert('analytics', [
+            'ts' => time(),
+            'analytic_id' => mt_rand(1000, 9999),
+            'status' => mt_rand(200, 599),
+            'metadata' => json_encode(['other_id' => $otherId = 'vid_known_identifier_321']),
+        ]);
+        DB::connection('clickhouse')->insert('analytics', [
+            'ts' => time(),
+            'analytic_id' => mt_rand(1000, 9999),
+            'status' => mt_rand(200, 599),
+            'metadata' => json_encode(['other_id' => uniqid('vid_', true)]),
+        ]);
+
+        // Act & Assert
+        self::assertSame(
+            1,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->where('metadata->other_id', $otherId)
+                ->count()
+        );
+    }
+
     public function test_select(): void
     {
         // Arrange

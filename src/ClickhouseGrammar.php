@@ -7,6 +7,7 @@ namespace Patoui\LaravelClickhouse;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Patoui\LaravelClickhouse\Traits\HasBindings;
 
 class ClickhouseGrammar extends Grammar
@@ -274,5 +275,57 @@ class ClickhouseGrammar extends Grammar
     protected function compileUpdateWithoutJoins(Builder $query, $table, $columns, $where): string
     {
         return "alter table {$table} update {$columns} {$where}";
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
+
+        return 'JSONExtractString('.$field.$path.')';
+    }
+
+    /**
+     * Wrap the given JSON path.
+     *
+     * @param  string  $value
+     * @param  string  $delimiter
+     * @return string
+     */
+    protected function wrapJsonPath($value, $delimiter = '->')
+    {
+        $value = preg_replace("/([\\\\]+)?\\'/", "''", $value);
+
+        $jsonPath = collect(explode($delimiter, $value))
+            ->map(fn ($segment) => $this->wrapJsonPathSegment($segment))
+            ->join('.');
+
+        return sprintf("'%s'", $jsonPath);
+    }
+
+    /**
+     * Wrap the given JSON path segment.
+     *
+     * @param  string  $segment
+     * @return string
+     */
+    protected function wrapJsonPathSegment($segment)
+    {
+        if (preg_match('/(\[[^\]]+\])+$/', $segment, $parts)) {
+            $key = Str::beforeLast($segment, $parts[0]);
+
+            if (! empty($key)) {
+                return $key.$parts[0];
+            }
+
+            return $parts[0];
+        }
+
+        return $segment;
     }
 }

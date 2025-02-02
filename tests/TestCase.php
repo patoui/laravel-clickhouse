@@ -37,7 +37,8 @@ class TestCase extends BaseTestCase
                 analytic_id     UInt32,
                 status          UInt16,
                 label           Nullable(String),
-                name            String DEFAULT \'\'
+                name            String DEFAULT \'\',
+                metadata        Nullable(String),
             )
             ENGINE = MergeTree
             PARTITION BY dt

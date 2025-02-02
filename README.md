@@ -59,7 +59,6 @@ See `tests` directory for additional examples
 Below is a list of currently untested methods or functionality. This does not mean that they won't work, just that there is currently no test coverage.
 
 - `union`
-- JSON where clause `->where('meta->name', 'foobar')`
 - `whereJsonContains`
 - `whereJsonLength`
 - `whereBetween`

@@ -158,6 +158,30 @@ class ModelTest extends TestCase
         );
     }
 
+    public function test_where_json(): void
+    {
+        // Arrange
+        $time = strtotime('-11 minutes');
+        Analytic::create([
+            'ts' => time(),
+            'analytic_id' => mt_rand(1000, 9999),
+            'status' => mt_rand(200, 599),
+            'metadata' => json_encode(['other_id' => $otherId = 'vid_known_identifier_321']),
+        ]);
+        Analytic::create([
+            'ts' => time(),
+            'analytic_id' => mt_rand(1000, 9999),
+            'status' => mt_rand(200, 599),
+            'metadata' => json_encode(['other_id' => uniqid('vid_', true)]),
+        ]);
+
+        // Act & Assert
+        self::assertSame(
+            1,
+            Analytic::where('metadata->other_id', $otherId)->count()
+        );
+    }
+
     public function test_where_null(): void
     {
         // Arrange
