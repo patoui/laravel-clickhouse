@@ -287,7 +287,7 @@ class ClickhouseGrammar extends Grammar
     {
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
-        return 'JSONExtractString(' . $field . $path . ')';
+        return 'simpleJSONExtractString(' . $field . $path . ')';
     }
 
     /**
