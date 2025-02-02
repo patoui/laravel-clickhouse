@@ -54,6 +54,21 @@ class ModelTest extends TestCase
         );
     }
 
+    public function test_or_where(): void
+    {
+        // Arrange
+        Analytic::create(['ts' => time(), 'analytic_id' => $analyticId = mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]);
+        Analytic::create(['ts' => time(), 'analytic_id' => $analyticId++, 'status' => mt_rand(200, 599)]);
+
+        // Act & Assert
+        self::assertSame(
+            2,
+            Analytic::where('analytic_id', $analyticId--)
+                ->orWhere('analytic_id', $analyticId)
+                ->count()
+        );
+    }
+
     public function test_where_date(): void
     {
         // Arrange

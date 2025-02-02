@@ -76,6 +76,30 @@ class QueryTest extends TestCase
         );
     }
 
+    public function test_or_where(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => $analyticId = mt_rand(1000, 9999), 'status' => mt_rand(200, 599)]
+        );
+        DB::connection('clickhouse')->insert(
+            'analytics',
+            ['ts' => time(), 'analytic_id' => $analyticId++, 'status' => mt_rand(200, 599)]
+        );
+
+        // Act & Assert
+        self::assertSame(
+            2,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                // ensure this condition is false
+                ->where('analytic_id', $analyticId--)
+                ->orWhere('analytic_id', $analyticId)
+                ->count()
+        );
+    }
+
     public function test_where_date(): void
     {
         // Arrange
