@@ -27,6 +27,8 @@ services:
       - ./clickhouse:/var/lib/clickhouse
     networks:
       - app-network
+    environment:
+      - CLICKHOUSE_SKIP_USER_SETUP=1
 
 #Docker Networks
 networks:
