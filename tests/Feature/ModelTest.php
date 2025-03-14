@@ -15,7 +15,12 @@ class ModelTest extends TestCase
     {
         // Arrange & Act & Assert
         $this->expectNotToPerformAssertions();
-        Analytic::create(['ts' => time(), 'analytic_id' => 321, 'status' => 204]);
+        Analytic::create([
+            'ts' => time(),
+            'analytic_id' => 321,
+            'status' => 204,
+            'is_enabled' => true,
+        ]);
     }
 
     public function test_create_count(): void

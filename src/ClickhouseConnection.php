@@ -265,7 +265,7 @@ class ClickhouseConnection extends BaseConnection
             return [[], []];
         }
 
-        if (! is_string(current(array_flip($bindings)))) {
+        if (! is_string(current(array_keys($bindings)))) {
             throw new InvalidArgumentException(
                 "Keys must be strings, i.e. ['name' => 'John', 'user_id' => 321]"
             );

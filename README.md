@@ -114,6 +114,11 @@ Run the tests:
 composer test
 ```
 
+### Caveats
+
+- the underlying `SeasClick` extension does not support all Clickhouse features
+    - it does not support the `Bool` type, a `UInt8` can be used instead
+
 ### Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.

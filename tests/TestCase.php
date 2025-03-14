@@ -36,6 +36,7 @@ class TestCase extends BaseTestCase
                 ts              DateTime,
                 analytic_id     UInt32,
                 status          UInt16,
+                is_enabled      UInt8,
                 label           Nullable(String),
                 name            String DEFAULT \'\',
                 metadata        Nullable(String),
