@@ -64,7 +64,6 @@ Below is a list of currently untested methods or functionality. This does not me
 - `whereBetween`
 - `whereNotBetween`
 - `orWhereColumn`
-- `whereExists`
 - Subquery Where Clauses
 - Upserts
 - `updateOrInsert`

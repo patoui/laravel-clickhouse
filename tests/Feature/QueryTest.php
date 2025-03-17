@@ -6,6 +6,7 @@ namespace Patoui\LaravelClickhouse\Tests\Feature;
 
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
+use Patoui\LaravelClickhouse\ClickhouseBuilder;
 use Patoui\LaravelClickhouse\Tests\TestCase;
 
 class QueryTest extends TestCase
@@ -269,6 +270,39 @@ class QueryTest extends TestCase
                 ->table('analytics')
                 ->where('metadata->other_id', $otherId)
                 ->count()
+        );
+    }
+
+    public function test_where_exists(): void
+    {
+        // Arrange
+        DB::connection('clickhouse')->insert('analytics', [
+            'ts' => time(),
+            'analytic_id' => mt_rand(1000, 9999),
+            'status' => 100 + mt_rand(1, 99),
+        ]);
+        DB::connection('clickhouse')->insert('analytics', [
+            'ts' => time(),
+            'analytic_id' => mt_rand(1000, 9999),
+            'status' => 100,
+        ]);
+
+        // Act & Assert
+        self::assertSame(
+            2,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereExists(function (ClickhouseBuilder $query) {
+                    $query->from('analytics')->where('status', '>', 100);
+                })->count()
+        );
+        self::assertSame(
+            0,
+            DB::connection('clickhouse')
+                ->table('analytics')
+                ->whereExists(function (ClickhouseBuilder $query) {
+                    $query->from('analytics')->where('status', '<', 100);
+                })->count()
         );
     }
 
